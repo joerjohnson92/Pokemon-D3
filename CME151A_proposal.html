@@ -4,10 +4,15 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 	<title> Project</title>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.js"></script>
 	<script type="text/css" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.css"></script>
+
+	<style type="text/css">
+
+	</style>
 </head>
 
 <body>
@@ -31,7 +36,7 @@
 </p>
 	</div>
 
-	 <form action="/action_page.php">
+	 <!--<form action="/action_page.php">-->
 	 	<label> Select the variable on the x-axis </label>
   		<select name="xAxis">
 			<option value="Total">Total</option>
@@ -52,32 +57,44 @@
 			<option value="Special Defense">Special Defense</option>
 			<option value="Speed">Speed</option>
   		</select>
-  		<input type="submit" value="Submit">
-	</form> 
+  		<button id="submit">Submit</button>
+	<!--</form>-->
 
 	<script type="text/javascript">
+		/* currently selected variables to plot */
+		var xval = document.getElementsByName("xAxis")[0].value;
+		var yval = document.getElementsByName("yAxis")[0].value;
 
+		/* variable to store all loaded data */
 		var data;
 		
+		/* scales and axes */
 		var xScale;
 		var yScale;
-		
+		var xAxis;
+		var yAxis;
+
+		/* dimensions of svg and padding */
 		var w = 1000;
 		var h = 600;
 		var padding = 50;
 		
+		/* variables to store x-y data specific arrays */
 		var xdata;
 		var ydata;
-    	
+
+		/* append svg container */
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+		/* container for plotted points */
+    	var points = svg.append("g")
+    					.attr("class", "points");
+
     	d3.csv("Pokemon.csv", function(d){data = d;
-
-	    	var svg = d3.select("body")
-    				.append("svg")
-    				.attr("width", w)
-    				.attr("height", h);
-
-    		// temporarily extracting variables HP and Attack
-    		// everything in the .csv is a string
+    		// What do we want to be our default?
     		xdata = data.map(function(d) {
     			return parseInt(d.HP);
     		});
@@ -86,7 +103,7 @@
     			return parseInt(d.Attack);
     		});
     		
-    		// need to update this to be dynamic with selected attribute
+    		// Define axes
     		xScale = d3.scaleLinear()
     			.domain([0, d3.max(xdata)])
     			.range([padding, w-padding]);
@@ -96,17 +113,14 @@
 				.range([h-padding, padding]);
 
 			// Define axes
-			var xAxis = d3.axisBottom()
-				.scale(xScale);
+			xAxis = d3.axisBottom()
+					.scale(xScale);
 
-			var yAxis = d3.axisLeft()
-				.scale(yScale);
+			yAxis = d3.axisLeft()
+					.scale(yScale);
 
-			// Plot points
-    		var points = svg.append("g")
-    						.attr("class", "points");
-
-    		points.selectAll("circle")
+			// PLOT CIRCLES FOR DEBUGGING
+    		/*points.selectAll("circle")
     			.data(d)
     			.enter()
     			.append("circle")
@@ -116,12 +130,55 @@
     			.attr("cy", function(d){
     				return yScale(d.Attack);
     			})
-    			.attr("r", 2)
-    			.on("click", function(d) {
-    				console.log(d);
-    			});
+    			.attr("r", 4)
+    			// append tooltip on mouseover
+    			.on("mouseover", function(d) {
 
-    		/*points.selectAll("image")
+    				var xpos = parseFloat(d3.select(this).attr("cx"));
+    				var ypos = parseFloat(d3.select(this).attr("cy"));
+
+    				points.append("rect")
+    					.attr("id", "tooltip_bg")
+    					.attr("x", xpos)
+    					.attr("y", ypos)
+    					.attr("width", "250")
+    					.attr("height", "100")
+    					.attr("fill", "black")
+    					.attr("fill-opacity", "0.5");
+
+
+    				points.append("text")
+    					.attr("id", "tooltip_text")
+    					.attr("x", xpos + 15)
+    					.attr("y", ypos + 15)
+    					.attr("text-anchor", "left")
+    					.attr("font-family", "helvetica")
+    					.attr("font-size", "11px")
+    					.attr("font-weight", "bold")
+    					.attr("fill", "white")
+    					.append("tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 15)
+    						.text("Name: " + d.Name)
+    					.append("tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 30)
+    						.text("HP: " + d.HP)
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 45)
+    						.text("Attack: " + d.Attack)
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 60)
+    						.text("Defense: " + d.Defense)
+    			})
+    			.on("mouseout", function() {
+    				d3.select("#tooltip_text").remove();
+    				d3.select("#tooltip_bg").remove();
+    			});*/
+
+    		points.selectAll("image")
     			.data(d)
     			.enter()
     			.append("svg:image")
@@ -133,7 +190,52 @@
     			})
     			.attr("y", function(d){
     				return yScale(d.Attack);
-    			});*/
+    			})
+    			.on("mouseover", function(d) {
+
+    				var xpos = parseFloat(d3.select(this).attr("x"));
+    				var ypos = parseFloat(d3.select(this).attr("y"));
+
+    				points.append("rect")
+    					.attr("id", "tooltip_bg")
+    					.attr("x", xpos)
+    					.attr("y", ypos)
+    					.attr("width", "250")
+    					.attr("height", "100")
+    					.attr("fill", "black")
+    					.attr("fill-opacity", "0.5");
+
+
+    				points.append("text")
+    					.attr("id", "tooltip_text")
+    					.attr("x", xpos + 15)
+    					.attr("y", ypos + 15)
+    					.attr("text-anchor", "left")
+    					.attr("font-family", "helvetica")
+    					.attr("font-size", "11px")
+    					.attr("font-weight", "bold")
+    					.attr("fill", "white")
+    					.append("tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 15)
+    						.text("Name: " + d.Name)
+    					.append("tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 30)
+    						.text("HP: " + d.HP)
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 45)
+    						.text("Attack: " + d.Attack)
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 60)
+    						.text("Defense: " + d.Defense)
+    			})
+    			.on("mouseout", function() {
+    				d3.select("#tooltip_text").remove();
+    				d3.select("#tooltip_bg").remove();
+    			});
 
     		// Create axes
     		svg.append("g")
@@ -145,9 +247,134 @@
     			.attr("class", "y_axis")
     			.attr("transform", "translate(" + padding + ",0)")
     			.call(yAxis);
-
-
     	});
+
+    	// Update the graph whenever the submit button is clicked
+    	d3.select("#submit")
+			.on("click", function() {
+				// Get the new value fields
+				xval = document.getElementsByName("xAxis")[0].value;
+				yval = document.getElementsByName("yAxis")[0].value;
+
+				// Update the xdata and ydata
+				if (xval == "Total") {
+					xdata = data.map(function(d) {
+						return parseInt(d.Total);
+					});
+				} else if (xval == "HP") {
+					xdata = data.map(function(d) {
+						return parseInt(d.HP);
+					});
+				} else if (xval == "Attack") {
+					xdata = data.map(function(d) {
+						return parseInt(d.Attack);
+					});
+				} else if (xval == "Defense") {
+					xdata = data.map(function(d) {
+						return parseInt(d.Defense);
+					});
+				} else if (xval == "Special Attack") {
+					xdata = data.map(function(d) {
+						return parseInt(d['Sp. Atk']);
+					});
+				} else if (xval == "Special Defense") {
+					xdata = data.map(function(d) {
+						return parseInt(d['Sp. Def']);
+					});
+				} else if (xval == "Speed") {
+					xdata = data.map(function(d) {
+						return parseInt(d.Speed);
+					});
+				}
+
+				if (yval == "Total") {
+					ydata = data.map(function(d) {
+						return parseInt(d.Total);
+					});
+				} else if (yval == "HP") {
+					ydata = data.map(function(d) {
+						return parseInt(d.HP);
+					});
+				} else if (yval == "Attack") {
+					ydata = data.map(function(d) {
+						return parseInt(d.Attack);
+					});
+				} else if (yval == "Defense") {
+					ydata = data.map(function(d) {
+						return parseInt(d.Defense);
+					});
+				} else if (yval == "Special Attack") {
+					ydata = data.map(function(d) {
+						return parseInt(d['Sp. Atk']);
+					});
+				} else if (yval == "Special Defense") {
+					ydata = data.map(function(d) {
+						return parseInt(d['Sp. Def']);
+					});
+				} else if (yval == "Speed") {
+					ydata = data.map(function(d) {
+						return parseInt(d.Speed);
+					});
+				}
+
+				// Update the xScale and yScale domains
+				xScale.domain([0, d3.max(xdata)]);
+				yScale.domain([0, d3.max(ydata)]);
+
+				// Update images
+				// To debug with circles, just change:
+				// image -> circle
+				// attr(x) -> attr(cx)
+				// attr(y) -> attr(cy)
+				points.selectAll("image")
+	    			.data(data)
+	    			.transition()
+	    			.attr("x", function(d){
+	    				if (xval == "Total") {
+	    					return xScale(d.Total);
+						} else if (xval == "HP") {
+							return xScale(d.HP);
+						} else if (xval == "Attack") {
+							return xScale(d.Attack);
+						} else if (xval == "Defense") {
+							return xScale(d.Defense);
+						} else if (xval == "Special Attack") {
+							return xScale(d['Sp. Atk']);
+						} else if (xval == "Special Defense") {
+							return xScale(d['Sp. Def']);
+						} else if (xval == "Speed") {
+							return xScale(d.Speed);
+						}
+	    			})
+	    			.attr("y", function(d){
+	    				if (yval == "Total") {
+	    					return yScale(d.Total);
+						} else if (yval == "HP") {
+							return yScale(d.HP);
+						} else if (yval == "Attack") {
+							return yScale(d.Attack);
+						} else if (yval == "Defense") {
+							return yScale(d.Defense);
+						} else if (yval == "Special Attack") {
+							return yScale(d['Sp. Atk']);
+						} else if (yval == "Special Defense") {
+							return yScale(d['Sp. Def']);
+						} else if (yval == "Speed") {
+							return yScale(d.Speed);
+						}
+	    			});
+
+	    		// Update axes
+	    		xAxis.scale(xScale);
+	    		yAxis.scale(yScale);
+	    		d3.select(".x_axis")
+	    			.transition()
+	    			.call(xAxis);
+	    		d3.select(".y_axis")
+	    			.transition()
+	    			.call(yAxis);
+			});
+
 
 	</script>
 
