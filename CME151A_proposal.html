@@ -67,19 +67,52 @@
     				.append("svg")
     				.attr("width", w)
     				.attr("height", h);
+    		
     		padding = 50
-    		var xScale = d3.scaleLinear().domain([45,250]).range([padding, w - padding]);
-			var yScale = d3.scaleLinear().domain([200,650]).range([h - padding, padding]);
 
-    		/*svg.selectAll("circle")
+    		// temporarily extracting variables HP and Attack
+    		var xdata = data.map(function(d) {
+    			return d.HP;
+    		});
+    		var ydata = data.map(function(d) {
+    			return d.Attack;
+    		});
+    		
+    		// need to update this to be dynamic with selected attribute
+    		var xScale = d3.scaleLinear()
+    			.domain([0, d3.max(xdata)])
+    			.range([padding, w-padding]);
+			
+			var yScale = d3.scaleLinear()
+				.domain([0, d3.max(ydata)])
+				.range([h-padding, padding]);
+
+			// Define axes
+			var xAxis = d3.axisBottom()
+				.scale(xScale);
+
+			var yAxis = d3.axisLeft()
+				.scale(yScale);
+
+			// Plot points
+    		svg.append("g")
+    			.attr("class", "points")
+    			.selectAll("circle")
     			.data(d)
     			.enter()
     			.append("circle")
-    			.attr("cx", function(d){return d.HP;})
-    			.attr("cy", function(d){return d.Attack;})
-    			.attr("r", 2);*/
+    			.attr("cx", function(d){
+    				return xScale(d.HP);
+    			})
+    			.attr("cy", function(d){
+    				return yScale(d.Attack);
+    			})
+    			.attr("r", 2)
+    			.on("click", function(d) {
+    				console.log(d);
+    			});
 
-    		svg.selectAll("image")
+    		/*svg.selectAll("image")
     			.data(d)
     			.enter()
     			.append("svg:image")
@@ -87,7 +120,18 @@
     			.attr("height", 30)
     			.attr("width" , 30)
     			.attr("x", function(d){return d.HP})
-    			.attr("y", function(d){return d.Attack})
+    			.attr("y", function(d){return d.Attack})*/
+
+    		// Create axes
+    		svg.append("g")
+    			.attr("class", "x_axis")
+    			.attr("transform", "translate(0," + (h - padding) + ")")
+    			.call(xAxis);
+
+    		svg.append("g")
+    			.attr("class", "y_axis")
+    			.attr("transform", "translate(" + padding + ",0)")
+    			.call(yAxis);
 
 
     	});
