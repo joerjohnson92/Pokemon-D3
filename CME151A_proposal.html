@@ -58,32 +58,40 @@
 	<script type="text/javascript">
 
 		var data;
+		
+		var xScale;
+		var yScale;
+		
+		var w = 1000;
+		var h = 600;
+		var padding = 50;
+		
+		var xdata;
+		var ydata;
+    	
     	d3.csv("Pokemon.csv", function(d){data = d;
-
-    		var w = 1000;
-    		var h = 600;
 
 	    	var svg = d3.select("body")
     				.append("svg")
     				.attr("width", w)
     				.attr("height", h);
-    		
-    		padding = 50
 
     		// temporarily extracting variables HP and Attack
-    		var xdata = data.map(function(d) {
-    			return d.HP;
+    		// everything in the .csv is a string
+    		xdata = data.map(function(d) {
+    			return parseInt(d.HP);
     		});
-    		var ydata = data.map(function(d) {
-    			return d.Attack;
+    		
+    		ydata = data.map(function(d) {
+    			return parseInt(d.Attack);
     		});
     		
     		// need to update this to be dynamic with selected attribute
-    		var xScale = d3.scaleLinear()
+    		xScale = d3.scaleLinear()
     			.domain([0, d3.max(xdata)])
     			.range([padding, w-padding]);
 			
-			var yScale = d3.scaleLinear()
+			yScale = d3.scaleLinear()
 				.domain([0, d3.max(ydata)])
 				.range([h-padding, padding]);
 
