@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+
+	<title> Project</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.js"></script>
+	<script type="text/css" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.css"></script>
+</head>
+
+<body>
+	<div>
+		<p>
+		We are interested in understanding the correlation between different raw attributes among Pokémon; for example, does a higher HP pokemon tend to also have a higher attack power?
+	</p>
+	<p>
+	We will be working with a Pokémon dataset from kaggle.com. This dataset includes information on 721 Pokémon, including number, name, type, and statistics such as HP, Attack, Defense, etc., i.e. the raw attributes that are used to calculate how much damage each Pokémon will do in the game.
+</p>
+<p>
+	The visualization will be an interactive scatter plot where the user can select two attributes to plot against each other, which will allow the user to determine graphically if what kind of correlation exists, if any, between two attributes. The points can be color-coded based on Pokémon type or potentially using sprite icons as each point.
+</p>
+<p>
+	Additional interactions: 
+	<ul>
+	<li>On-hover over a data point: list the Pokémon name and all other data points associated with that Pokémon </li>
+	<li>
+	Potential idea: on-click: display mini Pokédex on side (blurb/description about selected Pokémon)</li>
+</ul>
+</p>
+	</div>
+
+	 <form action="/action_page.php">
+	 	<label> Select the variable on the x-axis </label>
+  		<select name="xAxis">
+			<option value="Total">Total</option>
+			<option value="HP">HP</option>
+			<option value="Attack">Attack</option>
+			<option value="Defense">Defense</option>
+			<option value="Special Attack">Special Attack</option>
+			<option value="Special Defense">Special Defense</option>
+			<option value="Speed">Speed</option>
+  		</select>
+  		<label> Select the variable on the y-axis </label>
+  		<select name="yAxis">
+			<option value="Total">Total</option>
+			<option value="HP">HP</option>
+			<option value="Attack">Attack</option>
+			<option value="Defense">Defense</option>
+			<option value="Special Attack">Special Attack</option>
+			<option value="Special Defense">Special Defense</option>
+			<option value="Speed">Speed</option>
+  		</select>
+  		<input type="submit" value="Submit">
+	</form> 
+
+	<script type="text/javascript">
+
+		var data;
+    	d3.csv("Pokemon.csv", function(d){data = d;
+
+    		var w = 1000;
+    		var h = 600;
+
+	    	var svg = d3.select("body")
+    				.append("svg")
+    				.attr("width", w)
+    				.attr("height", h);
+    		padding = 50
+    		var xScale = d3.scaleLinear().domain([45,250]).range([padding, w - padding]);
+			var yScale = d3.scaleLinear().domain([200,650]).range([h - padding, padding]);
+
+    		/*svg.selectAll("circle")
+    			.data(d)
+    			.enter()
+    			.append("circle")
+    			.attr("cx", function(d){return d.HP;})
+    			.attr("cy", function(d){return d.Attack;})
+    			.attr("r", 2);*/
+
+    		svg.selectAll("image")
+    			.data(d)
+    			.enter()
+    			.append("svg:image")
+    			.attr("xlink:href", function(d){return "red-blue/" + d.id + ".png" })
+    			.attr("height", 30)
+    			.attr("width" , 30)
+    			.attr("x", function(d){return d.HP})
+    			.attr("y", function(d){return d.Attack})
+
+
+    	});
+
+	</script>
+
+</body>
+</html>
