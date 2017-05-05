@@ -103,9 +103,10 @@
 				.scale(yScale);
 
 			// Plot points
-    		svg.append("g")
-    			.attr("class", "points")
-    			.selectAll("circle")
+    		var points = svg.append("g")
+    						.attr("class", "points");
+
+    		points.selectAll("circle")
     			.data(d)
     			.enter()
     			.append("circle")
@@ -120,15 +121,19 @@
     				console.log(d);
     			});
 
-    		/*svg.selectAll("image")
+    		/*points.selectAll("image")
     			.data(d)
     			.enter()
     			.append("svg:image")
     			.attr("xlink:href", function(d){return "red-blue/" + d.id + ".png" })
     			.attr("height", 30)
     			.attr("width" , 30)
-    			.attr("x", function(d){return d.HP})
-    			.attr("y", function(d){return d.Attack})*/
+    			.attr("x", function(d){
+    				return xScale(d.HP);
+    			})
+    			.attr("y", function(d){
+    				return yScale(d.Attack);
+    			});*/
 
     		// Create axes
     		svg.append("g")
