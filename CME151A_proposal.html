@@ -93,6 +93,31 @@
     	var points = svg.append("g")
     					.attr("class", "points");
 
+		svg.append("text")
+        	.attr("x", (w / 2))             
+        	.attr("y", 12)
+        	.attr("text-anchor", "middle")  
+        	.style("font-size", "16px") 
+        	.style("text-decoration", "underline")  
+        	.attr("id", "title")
+        	.text("Attack vs. HP Graph");
+
+        svg.append("text")
+        	.attr("x", w / 2 - padding)
+			.attr("y", h - 10)
+			.attr("id", "xlab")
+			.style("text-anchor", "middle")
+			.text("HP");
+
+		svg.append("text")
+      		.attr("transform", "rotate(-90)")
+      		.attr("y", -5)
+      		.attr("x", -272)
+      		.attr("dy", "1em")
+      		.attr("id", "ylab")
+      		.style("text-anchor", "middle")
+      		.text("Attack");
+
     	d3.csv("Pokemon.csv", function(d){data = d;
     		// What do we want to be our default?
     		xdata = data.map(function(d) {
@@ -231,10 +256,24 @@
     						.attr("x", xpos + 5)
     						.attr("y", ypos + 60)
     						.text("Defense: " + d.Defense)
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 75)
+    						.text("Sp. Attack: " + d["Sp. Atk"])
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 90)
+    						.text("Sp. Defense: " + d["Sp. Def"])
+    					.append("svg:tspan")
+    						.attr("x", xpos + 5)
+    						.attr("y", ypos + 105)
+    						.attr("Speed: " + d.Speed)
     			})
     			.on("mouseout", function() {
-    				d3.select("#tooltip_text").remove();
-    				d3.select("#tooltip_bg").remove();
+    				setTimeout(function(){
+    				d3.selectAll("#tooltip_text").remove();
+    				d3.selectAll("#tooltip_bg").remove();
+    			}, 500);
     			});
 
     		// Create axes
@@ -364,6 +403,7 @@
 						}
 	    			});
 
+
 	    		// Update axes
 	    		xAxis.scale(xScale);
 	    		yAxis.scale(yScale);
@@ -373,7 +413,18 @@
 	    		d3.select(".y_axis")
 	    			.transition()
 	    			.call(yAxis);
+
+	    		d3.select("#title")
+	    		  .text(yval + " vs. " + xval + " Graph");
+
+	    		d3.select("#xlab")
+	    			.text(xval);
+
+	    		d3.select("#ylab")
+	    			.text(yval);
 			});
+
+
 
 
 	</script>
