@@ -233,7 +233,7 @@
 
     				points.append("text")
     					.attr("id", "tooltip_text")
-    					.attr("x", xpos + 15)
+    					.attr("x", xpos + 30)
     					.attr("y", ypos + 15)
     					.attr("text-anchor", "left")
     					.attr("font-family", "helvetica")
@@ -241,31 +241,31 @@
     					.attr("font-weight", "bold")
     					.attr("fill", "white")
     					.append("tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 15)
     						.text("Name: " + d.Name)
     					.append("tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 30)
     						.text("HP: " + d.HP)
     					.append("svg:tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 45)
     						.text("Attack: " + d.Attack)
     					.append("svg:tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 60)
     						.text("Defense: " + d.Defense)
     					.append("svg:tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 75)
     						.text("Sp. Attack: " + d["Sp. Atk"])
     					.append("svg:tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 90)
     						.text("Sp. Defense: " + d["Sp. Def"])
     					.append("svg:tspan")
-    						.attr("x", xpos + 5)
+    						.attr("x", xpos + 20)
     						.attr("y", ypos + 105)
     						.attr("Speed: " + d.Speed)
     			})
@@ -274,8 +274,22 @@
     				d3.selectAll("#tooltip_text").remove();
     				d3.selectAll("#tooltip_bg").remove();
     			}, 500);
+    			})
+    			.on("click", function(d){
+    				d3.select("#pokedex p").remove();
+    				d3.select("#pokedex p").remove();
+    				d3.select("#pokedex p").remove();
+    				d3.select("#pokedex p").remove();
+    				d3.select("#pokedex").
+    				append("p").
+    				text(d.id + ") " + d.Name)
+    				.append("p")
+    				.text("Type 1: " + d['Type 1'])
+    				.append("p")
+    				.text("Type 2: " + d['Type 2'])
+    				.append("p")
+    				.text(d['desc']);
     			});
-
     		// Create axes
     		svg.append("g")
     			.attr("class", "x_axis")
@@ -424,10 +438,15 @@
 	    			.text(yval);
 			});
 
-
-
-
 	</script>
+	<!-Still need to figure out how to move this to the side of chart ->
+	<h2> Pokedex entry: </h2>
+	<div id = "pokedex">
+		<p>Click a pokemon on the chart for more of its information</p>
+		<p> </p>
+		<p> </p>
+		<p> </p>
+	</div>
 
 </body>
 </html>
