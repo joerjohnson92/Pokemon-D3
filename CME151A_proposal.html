@@ -12,6 +12,15 @@
 
 	<style type="text/css">
 
+	#pokedex {
+		position:static;
+		display:inline-block;
+		vertical-align:top;
+		border-style:double;
+		width:300px;height:550px;
+		padding:15px 15px 15px 15px
+	}
+
 	</style>
 </head>
 
@@ -36,11 +45,10 @@
 </p>
 	</div>
 
-	 <!--<form action="/action_page.php">-->
 	 	<label> Select the variable on the x-axis </label>
-  		<select name="xAxis">
+  		<select name="xAxis" >
 			<option value="Total">Total</option>
-			<option value="HP">HP</option>
+			<option value="HP" selected = "selected">HP </option>
 			<option value="Attack">Attack</option>
 			<option value="Defense">Defense</option>
 			<option value="Special Attack">Special Attack</option>
@@ -51,14 +59,20 @@
   		<select name="yAxis">
 			<option value="Total">Total</option>
 			<option value="HP">HP</option>
-			<option value="Attack">Attack</option>
+			<option value="Attack" selected = "selected">Attack</option>
 			<option value="Defense">Defense</option>
 			<option value="Special Attack">Special Attack</option>
 			<option value="Special Defense">Special Defense</option>
 			<option value="Speed">Speed</option>
   		</select>
   		<button id="submit">Submit</button>
-	<!--</form>-->
+
+	<br>
+	<br>
+	<br>
+
+
+	<div id="plot" style="position:static;display:inline-block;vertical-align:top;"></div>
 
 	<script type="text/javascript">
 		/* currently selected variables to plot */
@@ -75,16 +89,19 @@
 		var yAxis;
 
 		/* dimensions of svg and padding */
-		var w = 1000;
+		var w = 700;
 		var h = 600;
 		var padding = 50;
-		
+
+		/* pokedex color background scale */
+		var colorScale;
+
 		/* variables to store x-y data specific arrays */
 		var xdata;
 		var ydata;
 
 		/* append svg container */
-		var svg = d3.select("body")
+		var svg = d3.select("#plot")
 					.append("svg")
 					.attr("width", w)
 					.attr("height", h);
@@ -137,6 +154,19 @@
 				.domain([0, d3.max(ydata)])
 				.range([h-padding, padding]);
 
+			// Define color mapping
+			colorScale = d3.scaleOrdinal()
+				.domain(data.map(function(d) {
+					return d['Type 1']
+				}))
+				.range([ '#bbff99','#ff704d', '#99c2ff', '#dfff80', '#ffffff', '#df80ff', '#ffffb3' , '#e6ccb3', '#ffcccc', '#ffbf80', '#df80ff', '#c2c2d6', '#52527a', '#cce6ff', '#990000']);
+			colorScalePoints = d3.scaleOrdinal()
+				.domain(data.map(function(d) {
+					return d['Type 1']
+				}))
+				.range([ '#00cc00','#ff704d', '#99c2ff', '#dfff80', '#000000', '#df80ff', '#ffff00' , '#e6ccb3', '#ffcccc', '#ffbf80', '#df80ff', '#c2c2d6', '#52527a', '#cce6ff', '#990000']);
+
+
 			// Define axes
 			xAxis = d3.axisBottom()
 					.scale(xScale);
@@ -144,8 +174,10 @@
 			yAxis = d3.axisLeft()
 					.scale(yScale);
 
+
+
 			// PLOT CIRCLES FOR DEBUGGING
-    		/*points.selectAll("circle")
+    		points.selectAll("circle")
     			.data(d)
     			.enter()
     			.append("circle")
@@ -156,140 +188,71 @@
     				return yScale(d.Attack);
     			})
     			.attr("r", 4)
+    			.attr("fill", function(d){
+    				return colorScalePoints(d['Type 1'])
+    			})
+    			.attr("stroke", "black")
+    			.attr("stroke-opacity", 0.5)
     			// append tooltip on mouseover
     			.on("mouseover", function(d) {
 
     				var xpos = parseFloat(d3.select(this).attr("cx"));
     				var ypos = parseFloat(d3.select(this).attr("cy"));
 
-    				points.append("rect")
-    					.attr("id", "tooltip_bg")
-    					.attr("x", xpos)
-    					.attr("y", ypos)
-    					.attr("width", "250")
-    					.attr("height", "100")
-    					.attr("fill", "black")
-    					.attr("fill-opacity", "0.5");
-
-
     				points.append("text")
     					.attr("id", "tooltip_text")
-    					.attr("x", xpos + 15)
-    					.attr("y", ypos + 15)
-    					.attr("text-anchor", "left")
+    					.attr("x", w - 25)
+    					.attr("y", 50)
+    					.attr("width", 300)
+    					.attr("text-anchor", "end")
     					.attr("font-family", "helvetica")
-    					.attr("font-size", "11px")
+    					.attr("font-size", "36px")
     					.attr("font-weight", "bold")
-    					.attr("fill", "white")
-    					.append("tspan")
-    						.attr("x", xpos + 5)
-    						.attr("y", ypos + 15)
-    						.text("Name: " + d.Name)
-    					.append("tspan")
-    						.attr("x", xpos + 5)
-    						.attr("y", ypos + 30)
-    						.text("HP: " + d.HP)
-    					.append("svg:tspan")
-    						.attr("x", xpos + 5)
-    						.attr("y", ypos + 45)
-    						.text("Attack: " + d.Attack)
-    					.append("svg:tspan")
-    						.attr("x", xpos + 5)
-    						.attr("y", ypos + 60)
-    						.text("Defense: " + d.Defense)
+    					.attr("fill", "black")
+    					.text(d.Name);
     			})
     			.on("mouseout", function() {
     				d3.select("#tooltip_text").remove();
     				d3.select("#tooltip_bg").remove();
-    			});*/
-
-    		points.selectAll("image")
-    			.data(d)
-    			.enter()
-    			.append("svg:image")
-    			.attr("xlink:href", function(d){return "red-blue/" + d.id + ".png" })
-    			.attr("height", 30)
-    			.attr("width" , 30)
-    			.attr("x", function(d){
-    				return xScale(d.HP);
     			})
-    			.attr("y", function(d){
-    				return yScale(d.Attack);
-    			})
-    			.on("mouseover", function(d) {
+    			.on("click", function(d) {
+    				d3.select("#pokepic").attr("src","red-blue/" + d.id + ".png");
+    				var pokedex = d3.select("#pokedex");
+    				pokedex.attr("style", "background-color:" + colorScale(d['Type 1']));
+ 
+    				pokedex.select("h2").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+     				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
+    				pokedex.select("p").remove();
 
-    				var xpos = parseFloat(d3.select(this).attr("x"));
-    				var ypos = parseFloat(d3.select(this).attr("y"));
-
-    				points.append("rect")
-    					.attr("id", "tooltip_bg")
-    					.attr("x", xpos)
-    					.attr("y", ypos)
-    					.attr("width", "250")
-    					.attr("height", "100")
-    					.attr("fill", "black")
-    					.attr("fill-opacity", "0.5");
-
-
-    				points.append("text")
-    					.attr("id", "tooltip_text")
-    					.attr("x", xpos + 30)
-    					.attr("y", ypos + 15)
-    					.attr("text-anchor", "left")
-    					.attr("font-family", "helvetica")
-    					.attr("font-size", "11px")
-    					.attr("font-weight", "bold")
-    					.attr("fill", "white")
-    					.append("tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 15)
-    						.text("Name: " + d.Name)
-    					.append("tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 30)
-    						.text("HP: " + d.HP)
-    					.append("svg:tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 45)
-    						.text("Attack: " + d.Attack)
-    					.append("svg:tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 60)
-    						.text("Defense: " + d.Defense)
-    					.append("svg:tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 75)
-    						.text("Sp. Attack: " + d["Sp. Atk"])
-    					.append("svg:tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 90)
-    						.text("Sp. Defense: " + d["Sp. Def"])
-    					.append("svg:tspan")
-    						.attr("x", xpos + 20)
-    						.attr("y", ypos + 105)
-    						.attr("Speed: " + d.Speed)
-    			})
-    			.on("mouseout", function() {
-    				setTimeout(function(){
-    				d3.selectAll("#tooltip_text").remove();
-    				d3.selectAll("#tooltip_bg").remove();
-    			}, 500);
-    			})
-    			.on("click", function(d){
-    				d3.select("#pokedex p").remove();
-    				d3.select("#pokedex p").remove();
-    				d3.select("#pokedex p").remove();
-    				d3.select("#pokedex p").remove();
-    				d3.select("#pokedex").
-    				append("p").
-    				text(d.id + ") " + d.Name)
-    				.append("p")
-    				.text("Type 1: " + d['Type 1'])
-    				.append("p")
-    				.text("Type 2: " + d['Type 2'])
-    				.append("p")
+    				pokedex.append("h2").text(d.id + ") " + d.Name);
+    				pokedex.append("p")
+    				.text("Type 1: " + d['Type 1']);
+    				pokedex.append("p")
+    				.text("Type 2: " + d['Type 2']);
+    				pokedex.append("p")
+    				.text("HP: " + d['HP']);
+    				pokedex.append("p")
+    				.text("Attack: " + d['Attack']);
+    				pokedex.append("p")
+    				.text("Defense: " + d['Defense']);
+    				pokedex.append("p")
+    				.text("Special Attack: " + d['Sp. Atk']);
+    				pokedex.append("p")
+    				.text("Special Defense: " + d['Sp. Def']);
+    				pokedex.append("p")
+    				.text("Speed: " + d['Speed']);
+    				pokedex.append("p")
     				.text(d['desc']);
     			});
+
     		// Create axes
     		svg.append("g")
     			.attr("class", "x_axis")
@@ -379,10 +342,10 @@
 				// image -> circle
 				// attr(x) -> attr(cx)
 				// attr(y) -> attr(cy)
-				points.selectAll("image")
+				points.selectAll("circle")
 	    			.data(data)
 	    			.transition()
-	    			.attr("x", function(d){
+	    			.attr("cx", function(d){
 	    				if (xval == "Total") {
 	    					return xScale(d.Total);
 						} else if (xval == "HP") {
@@ -399,7 +362,7 @@
 							return xScale(d.Speed);
 						}
 	    			})
-	    			.attr("y", function(d){
+	    			.attr("cy", function(d){
 	    				if (yval == "Total") {
 	    					return yScale(d.Total);
 						} else if (yval == "HP") {
@@ -439,13 +402,19 @@
 			});
 
 	</script>
-	<!-Still need to figure out how to move this to the side of chart ->
-	<h2> Pokedex entry: </h2>
-	<div id = "pokedex">
-		<p>Click a pokemon on the chart for more of its information</p>
+	<div id="pokedex">
+	<img id="pokepic" src="logo.png" width="150" height="" style = "display: block; margin-left:auto; margin-right:auto"></img>
+	<h2> Click a pokemon on the chart for more of its information </h2>
 		<p> </p>
 		<p> </p>
 		<p> </p>
+		<p> </p>
+		<p> </p>
+		<p> </p>
+		<p> </p>
+		<p> </p>
+		<p> </p>
+
 	</div>
 
 </body>
